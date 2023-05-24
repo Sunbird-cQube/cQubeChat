@@ -1,3 +1,7 @@
+# cQubeChat
+A module that allows for Natural Language Querying to cQube Data
+
+
 ### Setup
 
 1. Create a python virtual environment and install dependencies:
