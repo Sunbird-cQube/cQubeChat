@@ -1,5 +1,8 @@
 import streamlit as st
 from streamlit_chat import message
+from streamlit_searchbox import st_searchbox
+from utils.prompt_manager import PromptManager
+
 import requests
 import json
 import pandas as pd
@@ -38,52 +41,51 @@ def add_sidebar():
     # Displays the content in the sidebar  
     st.sidebar.write(sidebar_content)
 
-def add_body():
+def add_body(search_counter = 0):
     c = st.container()
     if st.session_state['generated']:
         for i in range(len(st.session_state['generated'])):
             message(st.session_state['past'][i], is_user=True, key=str(i) + '_user')
             message(st.session_state["generated"][i], key=str(i))
 
-            # If the returned data is not empty, format it as a pandas DataFrame and display it
-            if st.session_state["data"][i]:
-                df = pd.DataFrame(st.session_state["data"][i])
-                st.dataframe(df.head(10))
-
     # Placeholder for the text input
-    user_input_placeholder = st.empty()
+    prompt_manager = PromptManager()
 
-    # Placeholder for the submit button
+    #Adding a searchbox
+    user_input = st_searchbox(
+        search_function=prompt_manager.search,
+        placeholder="Start Typing",
+        label="",
+        default="",
+        clear_on_submit=False,
+        clearable=True,
+    )
+
+    # Submit button placeholder
     submit_button_placeholder = st.empty()
-
-    # Check if 'user_input' exists in the session state and use its value, else use the selected option.
-    user_input = user_input_placeholder.text_input("You: ", st.session_state.get('user_input'), key="input", placeholder="Enter prompt")
 
     # Save the typed input in session state
     st.session_state['user_input'] = user_input
 
     # Define a button for submitting the query
     submit_button = submit_button_placeholder.button("Submit Query")
+    
+    if submit_button and st.session_state["searchbox"]["result"]!='':
 
-    if submit_button and user_input != '':
-
-        print("Will Send input to Text2SQL")
+        print("Will Send input to Text2SQL : " + user_input)
         # TODO: register callback for Text2SQL 
         
         # TODO: store the output 
-        #st.session_state.past.append(user_input)
-        #st.session_state.generated.append(query)
-
-        # Empty the user_input session state and update the text input placeholder
-        st.session_state['user_input'] = ''
-        user_input_placeholder.text_input("You: ", st.session_state.get('user_input'))
+        st.session_state.past.append(user_input)
+        st.session_state.generated.append("Will Send input to Text2SQL : " + user_input)
         
+        # Empty the user_input session state
+        st.session_state['user_input'] = ''
+        st.session_state["searchbox"]["result"]=''
+
         # Force a rerun to immediately reflect the changes in the chat
         st.experimental_rerun()
 
-
-
 # Function calls
-
 add_sidebar()
 add_body()
