@@ -2,6 +2,7 @@ import streamlit as st
 
 st.title("cQubeChat")
 st.caption("Talk your way through data")
+st.text_input("Search your Query here !")
 
 with open("ui/sidebar.md", "r") as sidebar_file:
     sidebar_content = sidebar_file.read()
