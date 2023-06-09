@@ -2,10 +2,39 @@ import streamlit as st
 from streamlit_chat import message
 from streamlit_searchbox import st_searchbox
 from utils.prompt_manager import PromptManager
+from langchain.chat_models import ChatOpenAI
+from langchain.sql_database import SQLDatabase
+from langchain.agents.agent_toolkits import SQLDatabaseToolkit
+from langchain.agents import create_sql_agent
+from langchain.agents import load_tools
+from langchain.agents import initialize_agent
+from langchain.llms.openai import OpenAI
+import os
 
 import requests
 import json
 import pandas as pd
+
+# os.environ['OPENAI_API_KEY'] = "your_open_api_key"
+# os.environ['SERPAPI_API_KEY'] = "your_serp_api_key"
+
+# # Initialize Language Models
+# llm = ChatOpenAI(model_name="gpt-3.5-turbo")
+
+# # Initialize SQL Database Toolkit
+# db_user = "db_user"
+# db_password = "db_password"
+# db_host = "db_host"
+# db_name = "db_name"
+# db = SQLDatabase.from_uri(f"mysql+pymysql://{db_user}:{db_password}@{db_host}/{db_name}")
+# toolkit = SQLDatabaseToolkit(db=db)
+
+#Initialize the Agent Executor
+# agent_executor = create_sql_agent(
+#     llm = llm,
+#     toolkit = toolkit,
+#     verbose = True
+# )
 
 st.set_page_config(
     page_title="cQubeChat",
@@ -23,7 +52,7 @@ st.set_page_config(
 
 st.title("cQubeChat")
 st.caption("Talk your way through data")
-st.text_input("Search your Query here !")
+user_input = st.text_input("Search your Query here !")
 
 # Adding keys to store the chat
 if 'generated' not in st.session_state:
@@ -52,23 +81,41 @@ def add_body(search_counter = 0):
     # Placeholder for the text input
     prompt_manager = PromptManager()
 
-    #Adding a searchbox
-    user_input = st_searchbox(
-        search_function=prompt_manager.search,
-        placeholder="Start Typing",
-        label="",
-        default="",
-        clear_on_submit=False,
-        clearable=True,
-    )
+    # #Adding a searchbox
+    # user_input = st_searchbox(
+    #     search_function=prompt_manager.search,
+    #     placeholder="Start Typing",
+    #     label="",
+    #     default="",
+    #     clear_on_submit=False,
+    #     clearable=True,
+    # )
 
     # Submit button placeholder
     submit_button_placeholder = st.empty()
+    # # Save the typed input in session state
+    # st.session_state['user_input'] = user_input
+    # User input text box
 
-    # Save the typed input in session state
-    st.session_state['user_input'] = user_input
-
-    # Define a button for submitting the query
+# chat_history = []
+# # Process user input and display chat history
+# if st.button("Send"):
+#     # Add user input to chat history
+#     chat_history.append(("User", user_input))
+    
+#     # Get chatbot response
+#     bot_response = agent_executor.run(user_input)
+    
+#     # Add bot response to chat history
+#     chat_history.append(("Chatbot", bot_response))
+    
+# # Display chat history
+# for sender, message in chat_history:
+#     if sender == "User":
+#         st.text_input("User:", value=message, disabled=True)
+#     else:
+#         st.text_area("Chatbot:", value=message, disabled=True)
+#Define a button for submitting the query
     submit_button = submit_button_placeholder.button("Submit Query")
     
     if submit_button and st.session_state["searchbox"]["result"]!='':
