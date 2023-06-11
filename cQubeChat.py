@@ -54,6 +54,7 @@ st.title("cQubeChat")
 st.caption("Talk your way through data")
 
 # Set up session state
+# To store the chat history
 if 'chat_history' not in st.session_state:
     st.session_state.chat_history = []
 
