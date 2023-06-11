@@ -52,14 +52,37 @@ st.set_page_config(
 
 st.title("cQubeChat")
 st.caption("Talk your way through data")
-user_input = st.text_input("Search your Query here !")
 
-# Adding keys to store the chat
-if 'generated' not in st.session_state:
-    st.session_state['generated'] = []
+# Set up session state
+if 'chat_history' not in st.session_state:
+    st.session_state.chat_history = []
 
-if 'past' not in st.session_state:
-    st.session_state['past'] = []
+# User input text box
+user_input = st.text_input("Search yout Query here !")
+
+# Process user input and display chat history
+if st.button("Send"):
+    # Add user input to chat history
+    st.session_state.chat_history.append(("User", user_input))
+    
+    # Get chatbot response
+    bot_response = agent_executor.run(user_input)
+    
+    # Add bot response to chat history
+    st.session_state.chat_history.append(("Chatbot", bot_response))
+    
+# Display chat history
+for sender, message in st.session_state.chat_history:
+    if sender == "User":
+        st.text_input("User:", value=message, disabled=True)
+    else:
+        st.text_area("Chatbot:", value=message, disabled=True)
+# # Adding keys to store the chat
+# if 'generated' not in st.session_state:
+#     st.session_state['generated'] = []
+
+# if 'past' not in st.session_state:
+#     st.session_state['past'] = []
 
 def add_sidebar():
     with open("ui/sidebar.md", "r") as sidebar_file:
@@ -68,18 +91,18 @@ def add_sidebar():
     with open("ui/styles.md", "r") as styles_file:
       styles_content = styles_file.read()
     
-    #Displays the content in the sidebar  
+    # Displays the content in the sidebar  
     st.sidebar.write(sidebar_content)
 
-def add_body(search_counter = 0):
-    c = st.container()
-    if st.session_state['generated']:
-        for i in range(len(st.session_state['generated'])):
-            message(st.session_state['past'][i], is_user=True, key=str(i) + '_user')
-            message(st.session_state["generated"][i], key=str(i))
+# def add_body(search_counter = 0):
+#     c = st.container()
+#     if st.session_state['generated']:
+#         for i in range(len(st.session_state['generated'])):
+#             message(st.session_state['past'][i], is_user=True, key=str(i) + '_user')
+#             message(st.session_state["generated"][i], key=str(i))
 
-    # Placeholder for the text input
-    prompt_manager = PromptManager()
+#     # Placeholder for the text input
+#     prompt_manager = PromptManager()
 
     # #Adding a searchbox
     # user_input = st_searchbox(
@@ -92,48 +115,30 @@ def add_body(search_counter = 0):
     # )
 
     # Submit button placeholder
-    submit_button_placeholder = st.empty()
+    # submit_button_placeholder = st.empty()
     # # Save the typed input in session state
     # st.session_state['user_input'] = user_input
     # User input text box
 
-chat_history = []
-# Process user input and display chat history
-if st.button("Send"):
-    # Add user input to chat history
-    chat_history.append(("User", user_input))
-    
-    # Get chatbot response
-    bot_response = agent_executor.run(user_input)
-    
-    # Add bot response to chat history
-    chat_history.append(("Chatbot", bot_response))
-    
-# Display chat history
-for sender, message in chat_history:
-    if sender == "User":
-        st.text_input("User:", value=message, disabled=True)
-    else:
-        st.text_area("Chatbot:", value=message, disabled=True)
 #Define a button for submitting the query
-    submit_button = submit_button_placeholder.button("Submit Query")
+    # submit_button = submit_button_placeholder.button("Submit Query")
     
-    if submit_button and st.session_state["searchbox"]["result"]!='':
+    # if submit_button and st.session_state["searchbox"]["result"]!='':
 
-        print("Will Send input to Text2SQL : " + user_input)
-        # TODO: register callback for Text2SQL 
+    #     print("Will Send input to Text2SQL : " + user_input)
+    #     # TODO: register callback for Text2SQL 
         
-        # TODO: store the output 
-        st.session_state.past.append(user_input)
-        st.session_state.generated.append("Will Send input to Text2SQL : " + user_input)
+    #     # TODO: store the output 
+    #     st.session_state.past.append(user_input)
+    #     st.session_state.generated.append("Will Send input to Text2SQL : " + user_input)
         
-        # Empty the user_input session state
-        st.session_state['user_input'] = ''
-        st.session_state["searchbox"]["result"]=''
+    #     # Empty the user_input session state
+    #     st.session_state['user_input'] = ''
+    #     st.session_state["searchbox"]["result"]=''
 
-        # Force a rerun to immediately reflect the changes in the chat
-        st.experimental_rerun()
+    #     # Force a rerun to immediately reflect the changes in the chat
+    #     st.experimental_rerun()
 
 # Function calls
 add_sidebar()
-add_body()
+# add_body()
