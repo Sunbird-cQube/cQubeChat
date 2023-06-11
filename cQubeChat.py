@@ -63,12 +63,12 @@ if 'past' not in st.session_state:
 
 def add_sidebar():
     with open("ui/sidebar.md", "r") as sidebar_file:
-        sidebar_content = sidebar_file.read()
+      sidebar_content = sidebar_file.read()
 
     with open("ui/styles.md", "r") as styles_file:
-        styles_content = styles_file.read()
+      styles_content = styles_file.read()
     
-    # Displays the content in the sidebar  
+    #Displays the content in the sidebar  
     st.sidebar.write(sidebar_content)
 
 def add_body(search_counter = 0):
@@ -97,24 +97,24 @@ def add_body(search_counter = 0):
     # st.session_state['user_input'] = user_input
     # User input text box
 
-# chat_history = []
-# # Process user input and display chat history
-# if st.button("Send"):
-#     # Add user input to chat history
-#     chat_history.append(("User", user_input))
+chat_history = []
+# Process user input and display chat history
+if st.button("Send"):
+    # Add user input to chat history
+    chat_history.append(("User", user_input))
     
-#     # Get chatbot response
-#     bot_response = agent_executor.run(user_input)
+    # Get chatbot response
+    bot_response = agent_executor.run(user_input)
     
-#     # Add bot response to chat history
-#     chat_history.append(("Chatbot", bot_response))
+    # Add bot response to chat history
+    chat_history.append(("Chatbot", bot_response))
     
-# # Display chat history
-# for sender, message in chat_history:
-#     if sender == "User":
-#         st.text_input("User:", value=message, disabled=True)
-#     else:
-#         st.text_area("Chatbot:", value=message, disabled=True)
+# Display chat history
+for sender, message in chat_history:
+    if sender == "User":
+        st.text_input("User:", value=message, disabled=True)
+    else:
+        st.text_area("Chatbot:", value=message, disabled=True)
 #Define a button for submitting the query
     submit_button = submit_button_placeholder.button("Submit Query")
     
