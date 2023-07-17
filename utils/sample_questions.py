@@ -1,0 +1,21 @@
+questions = [
+    "",
+    "How many teachers were present in the week in the 'SAHIBGANJ' district?",
+    "How many schools were surveyed by NAS in 'Jharkhand' state?",
+    "How many teachers completed NISHTHA training in 'GUMLA' district?",
+    "What is the average play time in minutes on the Diksha app and portal for a 'Class 1' grade?",
+    "How many QR codes are linked to content for a 'Zoology' subject and 'HINDI' medium?",
+    "What is the total number of plays on the Diksha app and portal for 'Jharkhand' state?",
+    "How many teachers marked attendance daily in a 'SAHIBGANJ' district?",
+    "Get data for how many teachers marked attendance daily in 'SAHIBGANJ' and 'GOODA' district and present it as bar chart",
+    "What is the total number of teachers marked attendance weekly in 'BERHAIT' block?",
+    "What are the unique districts available in the dataset?",
+    "How many blocks are there in a 'GODDA' district?",
+    "List all the subjects available in the curriculum dimension.",
+    "What are the different mediums available for education in the dataset?",
+    "Retrieve the details of a specific district, including its state and population.",
+    "How many schools are there in a \"ALBERT EKKA\" block?",
+    "Which state has highest percentage of schools with drinking water in udise.",
+    "Which district has most schools enrolled in PM Poshan.",
+    "Which course in NISHTHA was most enrolled in the state of 'Jharkhand'."
+]
