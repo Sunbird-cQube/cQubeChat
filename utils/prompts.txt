@@ -1,3 +1,0 @@
-Count primary schools in Uttar Pradesh?
-Show me all schools?
-Get all students who scored more than in UT-1 and who are in class 8.

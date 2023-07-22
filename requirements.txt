@@ -8,3 +8,4 @@ streamlit-searchbox
 
 requests
 fast-autocomplete[levenshtein]
+langchain
