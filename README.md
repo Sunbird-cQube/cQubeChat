@@ -23,3 +23,6 @@ Features:
     ```
 
     This should open up a browser window with the cQubeChat app
+
+### Link to demo video: 
+https://drive.google.com/file/d/1WxyGClRnjW3ITVP18iJZux65y0R7N_zc/view?usp=sharing
