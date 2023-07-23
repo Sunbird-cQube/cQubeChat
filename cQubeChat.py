@@ -92,8 +92,6 @@ def add_sidebar():
     st.sidebar.write(sidebar_content)
 
 def add_chart(type, dataframe):
-    # dataframe = dataframe.drop(columns=dataframe.columns[0])
-    # dataframe = dataframe.drop(columns=dataframe.columns[0], errors='ignore')
     dataframe = dataframe.reset_index(drop=True)
     x_column = dataframe.columns[0]
     if 'bar' in type.lower():
