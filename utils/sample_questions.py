@@ -1,5 +1,8 @@
 questions = [
     "",
+    "What is the teacher attendance performance in all blocks of 'RANCHI' district as bar chart.",
+    "Get the performance of each district in 'Jharkhand' state for completion of course under nishtha program as bar graph.",
+    "What is the teacher attendance record in the last 10 days in Jharkhand as a bar chart",
     "How many teachers were present in the week in the 'SAHIBGANJ' district?",
     "How many schools were surveyed by NAS in 'Jharkhand' state?",
     "How many teachers completed NISHTHA training in 'GUMLA' district?",
