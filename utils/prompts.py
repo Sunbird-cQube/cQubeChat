@@ -8,6 +8,11 @@ I am sharing you the steps which you can take as reference to follow to create a
 {steps}
 ```
 
+I am also providing you the type of graph so make sure the queries are created such that graph can be created from the data of the query.
+```
+Graph type - {graph_type}
+```
+
 The table name is a combination of schema and table name separated by '.'. Make sure to add double quotes around table name but not on schema.
 For example 
 If the query is like this 

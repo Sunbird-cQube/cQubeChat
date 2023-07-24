@@ -6,6 +6,7 @@ import pandas as pd
 from utils.load_chain import load_details_chain, load_query_chain
 from utils.sample_questions import questions
 from utils.filter_schema import filter_schema
+import plotly.express as px
 import re
 
 st.set_page_config(
@@ -60,7 +61,7 @@ def fetch_query(prompt):
     details = json.loads(details)
 
     query_chain = st.session_state['query_chain']
-    query = query_chain.run({"schema": schema, "question": prompt, "steps": details["Steps"]})
+    query = query_chain.run({"graph_type": details["Graph Type"], "schema": schema, "question": prompt, "steps": details["Steps"]})
     query = clean_sql_query(query)(query)
     API_ENDPOINT = "https://api.t2s.samagra.io/data"
 
@@ -102,6 +103,9 @@ def add_chart(type, dataframe):
         return st.area_chart(dataframe, x=x_column)
     elif 'scatter' in type.lower():
         return st.map(dataframe, x=x_column)
+    elif 'pie' in type.lower():
+        fig = px.pie(dataframe, names=dataframe.columns[0], values=dataframe.columns[1])
+        return st.plotly_chart(fig)
     else:
         return
 
@@ -128,7 +132,7 @@ def add_body():
             if st.session_state["data"][i]:
                 df = pd.DataFrame(st.session_state["data"][i])
                 add_chart(st.session_state["graph_type"][i], df)
-                st.table(df.head(10))
+                st.write(df)
 
     # Placeholder for the text input
     user_input_placeholder = st.empty()
