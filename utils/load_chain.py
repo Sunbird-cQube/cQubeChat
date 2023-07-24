@@ -37,7 +37,7 @@ def load_details_chain():
 def load_query_chain():
 
     prompt = PromptTemplate(
-        input_variables=["schema", "question", "steps"],
+        input_variables=["schema", "question", "steps", "graph_type"],
         template=query_prompt
     )
 

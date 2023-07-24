@@ -6,6 +6,7 @@ import pandas as pd
 from utils.load_chain import load_details_chain, load_query_chain
 from utils.sample_questions import questions
 from utils.filter_schema import filter_schema
+import plotly.express as px
 import re
 
 st.set_page_config(
@@ -42,6 +43,9 @@ st.caption("Talk your way through data")
 def clean_sql_query(query):
     return lambda q: (q := query.replace('\n', ' ').replace('\r', '').replace('\t', '').replace('```sql', '').replace('```', '').strip())
 
+def clean_details(query):
+    return lambda q: (q := query.replace('\n', ' ').replace('\r', '').replace('\t', '').replace('```json', '').replace('```', '').strip())
+
 def fetch_query(prompt):
 
     if 'details_chain' not in st.session_state:
@@ -51,13 +55,13 @@ def fetch_query(prompt):
         st.session_state['query_chain'] = load_query_chain()
     
     details_chain = st.session_state['details_chain']
-    details =  details_chain.run(question = prompt)
+    details = details_chain.run(question = prompt)
+    details = clean_details(details)(details)
     schema = filter_schema(details)
     details = json.loads(details)
-    print(details)
 
     query_chain = st.session_state['query_chain']
-    query = query_chain.run({"schema": schema, "question": prompt, "steps": details["Steps"]})
+    query = query_chain.run({"graph_type": details["Graph Type"], "schema": schema, "question": prompt, "steps": details["Steps"]})
     query = clean_sql_query(query)(query)
     API_ENDPOINT = "https://api.t2s.samagra.io/data"
 
@@ -89,14 +93,19 @@ def add_sidebar():
     st.sidebar.write(sidebar_content)
 
 def add_chart(type, dataframe):
+    dataframe = dataframe.reset_index(drop=True)
+    x_column = dataframe.columns[0]
     if 'bar' in type.lower():
-        return st.bar_chart(dataframe.drop(columns=dataframe.columns[0]))
+        return st.bar_chart(dataframe, x=x_column)
     elif 'line' in type.lower():
-        return st.line_chart(dataframe.drop(columns=dataframe.columns[0]))
+        return st.line_chart(dataframe, x=x_column)
     elif 'area' in type.lower():
-        return st.area_chart(dataframe.drop(columns=dataframe.columns[0]))
+        return st.area_chart(dataframe, x=x_column)
     elif 'scatter' in type.lower():
-        return st.map(dataframe)
+        return st.map(dataframe, x=x_column)
+    elif 'pie' in type.lower():
+        fig = px.pie(dataframe, names=dataframe.columns[0], values=dataframe.columns[1])
+        return st.plotly_chart(fig)
     else:
         return
 
@@ -123,7 +132,7 @@ def add_body():
             if st.session_state["data"][i]:
                 df = pd.DataFrame(st.session_state["data"][i])
                 add_chart(st.session_state["graph_type"][i], df)
-                df = st.table(df.head(10))
+                st.write(df)
 
     # Placeholder for the text input
     user_input_placeholder = st.empty()
