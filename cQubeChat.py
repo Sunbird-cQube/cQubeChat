@@ -135,12 +135,14 @@ def add_body():
     if st.session_state['generated']:
         for i in range(len(st.session_state['generated'])):
             message(st.session_state['past'][i], is_user=True, key=str(i) + '_user')
-            message(st.session_state["generated"][i], key=str(i))
+            # message(st.session_state["generated"][i], key=str(i))
 
             if st.session_state["data"][i]:
                 df = pd.DataFrame(st.session_state["data"][i])
                 add_chart(st.session_state["graph_type"][i], df)
                 st.write(df)
+            expander = st.expander(r'''$\text{\textbf{SQL Statement}}$''')
+            expander.write(st.session_state["generated"][i])
 
     # Placeholder for the text input
     user_input_placeholder = st.empty()
