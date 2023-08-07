@@ -92,8 +92,16 @@ def add_sidebar():
     # Displays the content in the sidebar  
     st.sidebar.write(sidebar_content)
 
-def add_chart(type, dataframe):
+def reorder_columns(df):
+    # Check if the first column contains numeric values (decimal or integer)
+    if pd.api.types.is_numeric_dtype(df.iloc[:, 0]):
+        # Swap the first and second columns
+        df = df.iloc[:, [1, 0]].copy()
+    return df
+
+def add_chart(type, dataframe): 
     dataframe = dataframe.reset_index(drop=True)
+    dataframe = reorder_columns(dataframe)
     x_column = dataframe.columns[0]
     if 'bar' in type.lower():
         return st.bar_chart(dataframe, x=x_column)
