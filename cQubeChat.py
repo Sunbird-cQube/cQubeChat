@@ -47,22 +47,8 @@ def clean_details(query):
     return lambda q: (q := query.replace('\n', ' ').replace('\r', '').replace('\t', '').replace('```json', '').replace('```', '').strip())
 
 def fetch_query(prompt):
+    graph_type, query = get_cached_sql_query(prompt)
 
-    if 'details_chain' not in st.session_state:
-        st.session_state['details_chain'] = load_details_chain()
-
-    if 'query_chain' not in st.session_state:
-        st.session_state['query_chain'] = load_query_chain()
-    
-    details_chain = st.session_state['details_chain']
-    details = details_chain.run(question = prompt)
-    details = clean_details(details)(details)
-    schema = filter_schema(details)
-    details = json.loads(details)
-
-    query_chain = st.session_state['query_chain']
-    query = query_chain.run({"graph_type": details["Graph Type"], "schema": schema, "question": prompt, "steps": details["Steps"]})
-    query = clean_sql_query(query)(query)
     API_ENDPOINT = "https://api.t2s.samagra.io/data"
 
     payload = json.dumps({
@@ -78,9 +64,68 @@ def fetch_query(prompt):
 
     data = response.json()
     print(query, data["result"]["data"]["query_data"])
-    print("query", details["Graph Type"])
+    print("query", graph_type)
 
-    return query, data["result"]["data"]["query_data"], details["Graph Type"]
+    return query, data["result"]["data"]["query_data"], graph_type
+
+def save_query_graph_type(nlq_query, sql_query, graph_type):
+    url = "http://hasura:8080/api/rest/nlq-sql-mapping"
+    payload = json.dumps({
+        "nlqText": nlq_query,
+        "sqlQuery": sql_query,
+        "graphType": graph_type
+    })
+    headers = {
+        'Content-Type': 'application/json',
+        'x-hasura-access-key': '4GeEB2JCU5rBdLvQ4AbeqqrPGu7kk9SZDhJUZm7A'
+    }
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+    print(response.text)
+
+def get_cached_sql_query(nlq_query):
+
+    cached_query = ""
+    graph_type = ""
+
+    url = "http://hasura:8080/api/rest/sql-details"
+    payload = json.dumps({
+        "nlqText": nlq_query
+    })
+    headers = {
+        'Content-Type': 'application/json',
+        'x-hasura-access-key': '4GeEB2JCU5rBdLvQ4AbeqqrPGu7kk9SZDhJUZm7A'
+    }
+
+    response = requests.request("GET", url, headers=headers, data=payload)
+
+    details = response.json()
+    print(len(details["nlq_sql_mappings"]), details)
+    if(len(details["nlq_sql_mappings"]) != 0):
+        details = details["nlq_sql_mappings"][0]
+        cached_query = details["sql_query"]
+        graph_type = details["graph_type"]
+
+    if(cached_query == ""):        
+        if 'details_chain' not in st.session_state:
+            st.session_state['details_chain'] = load_details_chain()
+
+        if 'query_chain' not in st.session_state:
+            st.session_state['query_chain'] = load_query_chain()
+
+        details_chain = st.session_state['details_chain']
+        details = details_chain.run(question = nlq_query)
+        details = clean_details(details)(details)
+        schema = filter_schema(details)
+        details = json.loads(details)
+
+        query_chain = st.session_state['query_chain']
+        cached_query = query_chain.run({"graph_type": details["Graph Type"], "schema": schema, "question": nlq_query, "steps": details["Steps"]})
+        cached_query = clean_sql_query(cached_query)(cached_query)
+        graph_type = details["Graph Type"]
+        save_query_graph_type(nlq_query, cached_query, graph_type)
+
+    return graph_type, cached_query
 
 def add_sidebar():
     with open("ui/sidebar.md", "r") as sidebar_file:
@@ -94,9 +139,10 @@ def add_sidebar():
 
 def reorder_columns(df):
     # Check if the first column contains numeric values (decimal or integer)
-    if pd.api.types.is_numeric_dtype(df.iloc[:, 0]):
-        # Swap the first and second columns
-        df = df.iloc[:, [1, 0]].copy()
+    if df.shape[1] > 1:
+        if pd.api.types.is_numeric_dtype(df.iloc[:, 0]):
+            # Swap the first and second columns
+            df = df.iloc[:, [1, 0]].copy()
     return df
 
 def add_chart(type, dataframe): 

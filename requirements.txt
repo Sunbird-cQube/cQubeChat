@@ -1,5 +1,7 @@
 pandas
 matplotlib
+plotly
+python-dotenv
 
 #Streamlit imports
 streamlit
@@ -9,3 +11,5 @@ streamlit-searchbox
 requests
 fast-autocomplete[levenshtein]
 langchain
+sqlparse
+openai
