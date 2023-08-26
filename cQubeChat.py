@@ -8,6 +8,7 @@ from utils.sample_questions import questions
 from utils.filter_schema import filter_schema
 import plotly.express as px
 import re
+import os
 
 st.set_page_config(
     page_title="cQubeChat",
@@ -63,13 +64,12 @@ def fetch_query(prompt):
     response = requests.request("GET", API_ENDPOINT, headers=headers, data=payload)
 
     data = response.json()
-    print(query, data["result"]["data"]["query_data"])
-    print("query", graph_type)
 
     return query, data["result"]["data"]["query_data"], graph_type
 
 def save_query_graph_type(nlq_query, sql_query, graph_type):
-    url = "http://hasura:8080/api/rest/nlq-sql-mapping"
+    api_url = os.getenv('HASURA_API_URL')
+    url = api_url + "/api/rest/nlq-sql-mapping"
     payload = json.dumps({
         "nlqText": nlq_query,
         "sqlQuery": sql_query,
@@ -81,14 +81,14 @@ def save_query_graph_type(nlq_query, sql_query, graph_type):
     }
 
     response = requests.request("POST", url, headers=headers, data=payload)
-    print(response.text)
 
 def get_cached_sql_query(nlq_query):
+    api_url = os.getenv('HASURA_API_URL')
 
     cached_query = ""
     graph_type = ""
 
-    url = "http://hasura:8080/api/rest/sql-details"
+    url = api_url + "/api/rest/sql-details"
     payload = json.dumps({
         "nlqText": nlq_query
     })
@@ -100,7 +100,6 @@ def get_cached_sql_query(nlq_query):
     response = requests.request("GET", url, headers=headers, data=payload)
 
     details = response.json()
-    print(len(details["nlq_sql_mappings"]), details)
     if(len(details["nlq_sql_mappings"]) != 0):
         details = details["nlq_sql_mappings"][0]
         cached_query = details["sql_query"]

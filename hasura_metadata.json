@@ -1,0 +1,91 @@
+{
+  "type" : "replace_metadata",
+  "resource_version": 1,
+  "args": {
+    "version": 3,
+    "sources": [
+      {
+        "name": "default",
+        "kind": "postgres",
+        "tables": [
+          {
+            "table": {
+              "name": "nlq_sql_mappings",
+              "schema": "public"
+            }
+          }
+        ],
+        "configuration": {
+          "connection_info": {
+            "database_url": {
+              "from_env": "HASURA_GRAPHQL_DATABASE_URL"
+            },
+            "isolation_level": "read-committed",
+            "pool_settings": {
+              "connection_lifetime": 600,
+              "idle_timeout": 180,
+              "max_connections": 50,
+              "retries": 1
+            },
+            "use_prepared_statements": true
+          }
+        }
+      }
+    ],
+    "query_collections": [
+      {
+        "name": "allowed-queries",
+        "definition": {
+          "queries": [
+            {
+              "name": "GET sql query and graph type",
+              "query": "query GetSQLQuery($nlqText: String!) {\n  nlq_sql_mappings(where: { nlq_text: { _eq: $nlqText } }) {\n    sql_query\n    graph_type\n  }\n}"
+            },
+            {
+              "name": "POST nlq sql mapping",
+              "query": "mutation CreateNLQSQLMapping($nlqText: String!, $sqlQuery: String!, $graphType: String!) {\n  insert_nlq_sql_mappings(objects: {nlq_text: $nlqText, sql_query: $sqlQuery, graph_type: $graphType}) {\n    returning {\n      id\n      nlq_text\n      sql_query\n      created_at\n      graph_type\n    }\n  }\n}"
+            }
+          ]
+        }
+      }
+    ],
+    "allowlist": [
+      {
+        "collection": "allowed-queries",
+        "scope": {
+          "global": true
+        }
+      }
+    ],
+    "rest_endpoints": [
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "POST nlq sql mapping"
+          }
+        },
+        "methods": [
+          "POST"
+        ],
+        "name": "POST nlq sql mapping",
+        "url": "nlq-sql-mapping"
+      },
+      {
+        "comment": "",
+        "definition": {
+          "query": {
+            "collection_name": "allowed-queries",
+            "query_name": "GET sql query and graph type"
+          }
+        },
+        "methods": [
+          "GET"
+        ],
+        "name": "GET sql query and graph type",
+        "url": "sql-details"
+      }
+    ]
+  }
+}
