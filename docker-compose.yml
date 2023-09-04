@@ -17,12 +17,12 @@ services:
       - .env
     restart: always
     volumes: 
-      - ./00-postgres.sql:/docker-entrypoint-initdb.d/postgres.sql
+      - ./postgres.sql:/docker-entrypoint-initdb.d/postgres.sql
       - ./postgres-data:/var/lib/postgresql/data
-  chatbot:
-    image: chatbot
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - 8501:8501
+  # chatbot:
+  #   image: chatbot
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   ports:
+  #     - 8501:8501
